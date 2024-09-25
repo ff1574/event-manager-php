@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Listen for XDebug",
+      "type": "php",
+      "request": "launch",
+      "port": 9003,
+      "pathMappings": {
+        "/path/in/server": "${workspaceFolder}/path/to/project"
+      },
+      "log": true // Optional, to log debugging process
+    }
+  ]
+}
