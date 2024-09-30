@@ -1,0 +1,15 @@
+RewriteEngine On
+
+# Ensure the server uses HTTPS
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Enable URL Rewriting
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Adjust base URL to match the subdirectory path on the server
+RewriteBase /~ff1574/ISTE341/Project1Working/ 
+
+# Rewrite all URLs to Index.php while preserving the path info
+RewriteRule ^(.+)$ Index.php?url=$1 [QSA,L]
