@@ -13,21 +13,39 @@ final class Index
         error_reporting(E_ERROR);
         session_start();
         spl_autoload_register(['Index', 'loadClass']);
+
+        // Detect environment (local or production)
+        $env = self::detectEnvironment();
+
         define('PROJECT_ROOT', $_SERVER['DOCUMENT_ROOT'] . '/');
+
+        // Load configuration based on environment
+        $config = parse_ini_file(PROJECT_ROOT . 'config.ini', true);
+        $envConfig = $config[$env];
+
         define('PROJECT_URL', 'https://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\'));
         define('BASE_PATH', rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\'));
         define('TITLE', 'Project 1 - Franko');
     }
 
+    public static function detectEnvironment()
+    {
+        // Use server host to determine environment
+        if ($_SERVER['HTTP_HOST'] == 'localhost') {
+            return 'local';
+        } else {
+            return 'production';
+        }
+    }
+
     private static function handle()
     {
-        // Capture the 'url' parameter from the rewritten URL (handled by .htaccess)
-        $url = isset($_GET['url']) ? $_GET['url'] : '';  // Get the URL part after the domain
+        $url = isset($_GET['url']) ? $_GET['url'] : '';
 
         // Start with empty controller and action
         $controller = '';
         $action = '';
-        $params = [];  // Additional parameters
+        $params = [];
 
         if ($url) {
             // Split the URL by slashes

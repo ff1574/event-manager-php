@@ -15,7 +15,7 @@ class UserController extends Controller
         session_unset();
         session_destroy();
 
-        header('Location: ' . PROJECT_URL . '');
+        header('Location: ' . PROJECT_URL . '/Index.php');
         exit();
     }
 

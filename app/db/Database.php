@@ -7,10 +7,20 @@ class Database
 
     private function __construct()
     {
-        // Hardcode the database connection details
-        $dsn = "mysql:host=localhost;dbname=ff1574";
-        $username = "root";
-        $password = "";
+        $env = Index::detectEnvironment();
+
+        // Use the configuration based on the environment (from config.ini)
+        if ($env === 'local') {
+            $config = parse_ini_file(PROJECT_ROOT . 'Project1Working/app/config/config.ini', true);
+        } else {
+            $configPath = dirname(__DIR__, 2) . '/app/config/config.ini';
+            $config = parse_ini_file($configPath, true);
+        }
+        $dbConfig = $config[$env];
+
+        $dsn = "mysql:host=" . $dbConfig['db_host'] . ";dbname=" . $dbConfig['db_name'];
+        $username = $dbConfig['db_user'];
+        $password = $dbConfig['db_pass'];
 
         try {
             $this->pdo = new PDO($dsn, $username, $password);
