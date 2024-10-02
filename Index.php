@@ -11,7 +11,6 @@ final class Index
     private static function init()
     {
         error_reporting(E_ERROR);
-        session_start();
         spl_autoload_register(['Index', 'loadClass']);
 
         // Detect environment (local or production)
@@ -82,7 +81,8 @@ final class Index
             'app/model/',
             'app/view/',
             'app/controller/',
-            'app/db/'
+            'app/db/',
+            'app/session/'
         );
         foreach ($dirs as $dir) {
             if (file_exists($dir . $class_name . '.php')) {

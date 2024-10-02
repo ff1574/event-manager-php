@@ -1,14 +1,25 @@
 <?php
 
-class Controller {
+class Controller
+{
+    protected $session;
 
-    public function model() {
+    public function __construct()
+    {
+        // Initialize session handling
+        Session::start();
+        $this->session = new Session();
+    }
+
+    public function model()
+    {
         $model = str_replace("Controller", "Model", get_class($this));
         require_once 'app/model/' . $model . '.php';
         return new $model();
     }
 
-    public function view($template, $data = []) {
+    public function view($template, $data = [])
+    {
         if (!file_exists('app/view/' . $template . '.php')) {
             throw new Exception("Template file " . $template . " doesn't exist.");
         }

@@ -19,7 +19,7 @@
             ?>
                 <nav>
                     <a href="<?php echo PROJECT_URL; ?>/event/index">Events</a>
-                    <?php if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin']) { ?>
+                    <?php if (Session::get('isAdmin')) { ?>
                         <a href="<?php echo PROJECT_URL; ?>/admin/index">Admin</a>
                     <?php } ?>
                     <a href="<?php echo PROJECT_URL; ?>/user/logout">Sign Out</a>
@@ -27,6 +27,7 @@
             <?php
             }
             ?>
+
         </div>
     </header>
     <main class="container">

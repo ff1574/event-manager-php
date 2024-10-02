@@ -10,27 +10,23 @@ class UserController extends Controller
 
     public function logout()
     {
-        // Destroy the session
-        session_start();
-        session_unset();
-        session_destroy();
+        Session::destroy();
 
         header('Location: ' . PROJECT_URL . '/Index.php');
         exit();
     }
 
-
     public function welcome()
     {
         $data = $this->model()->getViewModel();
         if ($data) {
-
-            $_SESSION['username'] = $data['username'];
-            $_SESSION['email'] = $data['email'];
-            $_SESSION['isAdmin'] = $data['isAdmin'];
+            // Set session data using the Session class
+            Session::set('username', $data['username']);
+            Session::set('email', $data['email']);
+            Session::set('isAdmin', $data['isAdmin']);
 
             // Redirect based on admin status
-            if ($_SESSION['isAdmin']) {
+            if (Session::get('isAdmin')) {
                 header('Location: ' . PROJECT_URL . '/event/index&admin=true');
             } else {
                 header('Location: ' . PROJECT_URL . '/event/index');
