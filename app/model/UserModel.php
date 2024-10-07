@@ -2,14 +2,13 @@
 
 class UserModel extends Model
 {
+    private $db;
 
-    /**
-     * Validation rules for user input. This array contains the validation rules
-     * for the fields in the UserModel. Each key represents a field name and the
-     * value is an array of rules to validate that field.
-     *
-     * @var array
-     */
+    public function __construct()
+    {
+        $this->db = Database::getInstance()->getConnection();
+    }
+
     private $validationRules = [
         'username' => [
             'required' => true,
@@ -19,84 +18,133 @@ class UserModel extends Model
         ],
         'password' => [
             'required' => true,
-            // Changed numeric to false for testing
-            'numeric' => false,
             'min_length' => 4,
-            'max_length' => 8
-        ],
-        'email' => [
-            'required' => true
-        ]
-    ];
-
-    /**
-     * Hard-coded list of registered users for demonstration purposes. This array
-     * maps usernames to their corresponding passwords. This is used to simulate
-     * a user database in the absence of a real database connection.
-     *
-     * @var array
-     */
-    private $registeredUsers = [
-        'kmarasovic' => [
-            'email' => 'kmarasovic@example.com',
-            'password' => '1234',
-            'isAdmin' => true
-        ],
-        'jane' => [
-            'email' => 'jane@example.com',
-            'password' => '4321',
-            'isAdmin' => false
-        ],
-        'franko' => [
-            'email' => 'ff1574@rit.edu',
-            'password' => 'admin',
-            'isAdmin' => true
+            'max_length' => 60 // Updated max length to accommodate longer passwords if needed
         ],
     ];
 
-    /**
-     * Retrieves the user information after sanitizing and validating the input.
-     *
-     * This method is responsible for processing user input (username and password)
-     * from the form, sanitizing the inputs to ensure they are safe, and then
-     * validating the data against the predefined rules in the `$validationRules`
-     * array.
-     *
-     * If the input data passes the validation, the method checks whether the
-     * provided username exists in the list of registered users and if the password
-     * matches. If successful, the method returns an associative array containing the
-     * username and the user's email.
-     *
-     * If validation fails or the credentials are incorrect, it returns `false` or
-     * `null` respectively.
-     *
-     * @return array|null|bool Returns an array with `username` and `email` if
-     * credentials are correct, `false` if validation fails, or `null` if the
-     * credentials do not match.
-     */
     public function getViewModel()
     {
         // 1. Sanitize input data
         $username = $this->sanitize($_POST['username']);
         $password = $this->sanitize($_POST['password']);
-        // 2. Define an array to hold the data to be validated
+
+        // 2. Validate data
         $data = [
             'username' => $username,
             'password' => $password
         ];
-        // 3. Validate the data
         if (!$this->validate($data, $this->validationRules)) {
             return false;
         }
-        // 4 .Check if username exists and password matches
-        if (isset($this->registeredUsers[$username]) && $this->registeredUsers[$username]['password'] === $password) {
-            $data = [
-                'username' => $username,
-                'email' => $this->registeredUsers[$username]['email'],
-                'isAdmin' => $this->registeredUsers[$username]['isAdmin']
+
+        // 3. Retrieve user information from the database
+        $query = "SELECT a.*, r.name AS role_name FROM attendee a
+                  INNER JOIN role r ON a.role_id = r.role_id
+                  WHERE a.username = :username";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+        $stmt->execute();
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // 4. Validate credentials (plain text comparison)
+        if ($user && $user['password'] === $password) {
+            return [
+                'user_id' => $user['attendee_id'],
+                'username' => $user['username'],
+                'email' => $user['email'],
+                'isAdmin' => $user['role_name'] === 'admin'
             ];
-            return $data;
         }
+
         return null;
+    }
+
+    public function getAllUsers()
+    {
+        $query = "SELECT a.*, r.name AS role_name FROM attendee a
+              INNER JOIN role r ON a.role_id = r.role_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function deleteUser($userId)
+    {
+        if (!is_numeric($userId)) {
+            throw new Exception("Invalid user ID.");
+        }
+
+        $query = "DELETE FROM attendee WHERE attendee_id = :user_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+
+        if (!$stmt->execute()) {
+            throw new Exception("Failed to delete user.");
+        }
+    }
+
+    public function updateUser($userData)
+    {
+        try {
+            $query = "UPDATE attendee 
+                      SET first_name = :first_name, last_name = :last_name, email = :email, username = :username, role_id = :role_id
+                      WHERE attendee_id = :user_id";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':first_name', $userData['first_name']);
+            $stmt->bindParam(':last_name', $userData['last_name']);
+            $stmt->bindParam(':email', $userData['email']);
+            $stmt->bindParam(':username', $userData['username']);
+            $stmt->bindParam(':role_id', $userData['role_id']);
+            $stmt->bindParam(':user_id', $userData['user_id'], PDO::PARAM_INT);
+
+            if ($stmt->execute()) {
+                return true; // Return true on successful update
+            } else {
+                return "Failed to update user."; // Return error message on failure
+            }
+        } catch (Exception $e) {
+            return "Exception occurred: " . $e->getMessage(); // Return exception message on error
+        }
+    }
+
+    public function registerUser($data)
+    {
+        // 1. Sanitize input data
+        $firstName = $this->sanitize($data['first_name']);
+        $lastName = $this->sanitize($data['last_name']);
+        $email = $this->sanitize($data['email']);
+        $username = $this->sanitize($data['username']);
+        $password = $this->sanitize($data['password']);
+        $roleId = (int) $data['role_id'];
+
+        // 2. Check if the username already exists
+        $query = "SELECT * FROM attendee WHERE username = :username OR email = :email";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt->execute();
+
+        if ($stmt->fetch()) {
+            return "Username or email already exists.";
+        }
+
+        // 3. Insert new user data
+        $query = "INSERT INTO attendee (first_name, last_name, email, username, password, role_id) 
+                  VALUES (:first_name, :last_name, :email, :username, :password, :role_id)";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':first_name', $firstName, PDO::PARAM_STR);
+        $stmt->bindParam(':last_name', $lastName, PDO::PARAM_STR);
+        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+        $stmt->bindParam(':password', $password, PDO::PARAM_STR);
+        $stmt->bindParam(':role_id', $roleId, PDO::PARAM_INT);
+
+        if ($stmt->execute()) {
+            return true;
+        }
+
+        return "Registration failed. Please try again.";
     }
 }
