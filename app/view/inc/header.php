@@ -15,7 +15,7 @@
 
             <?php
             $currentUri = str_replace(BASE_PATH, '', $_SERVER['REQUEST_URI']);
-            if (!($currentUri === '/' || $currentUri === '/Index.php')) {
+            if (!($currentUri === '/' || $currentUri === '/Index.php' || $currentUri === '/user/register')) {
             ?>
                 <nav>
                     <a href="<?php echo PROJECT_URL; ?>/event/index">Events</a>
@@ -31,3 +31,10 @@
         </div>
     </header>
     <main class="container">
+
+        <!-- Display Messages -->
+        <?php if (isset($_GET['message'])): ?>
+            <div class="alert <?php echo $_GET['status'] === 'success' ? 'alert-success' : 'alert-danger'; ?>">
+                <?php echo htmlspecialchars($_GET['message']); ?>
+            </div>
+        <?php endif; ?>
