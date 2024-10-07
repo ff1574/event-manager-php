@@ -31,14 +31,15 @@ body {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 20px 20px 20px;
 }
 
 header {
   background-color: #fff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin: 20px 10px;
   padding: 20px;
   border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 header h1 {
@@ -57,6 +58,49 @@ nav a {
 
 nav a:hover {
   color: var(--primary-color);
+}
+
+/* Login & Register Page */
+.hero {
+  text-align: center;
+  padding: 30px 0;
+  color: #fff;
+}
+
+.hero h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  font-size: 1rem;
+  max-width: 800px;
+  margin: 0 auto 30px;
+}
+
+.features {
+  margin: 35px 50px;
+}
+
+.features h3 {
+  text-align: center;
+  font-size: 2rem;
+  margin-top: 0;
+  margin-bottom: 30px;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.feature-item {
+  text-align: center;
+}
+
+.feature-item img {
+  max-width: 120px;
 }
 
 .card {
@@ -92,6 +136,18 @@ nav a:hover {
   background-color: #2980b9;
 }
 
+.btn-secondary {
+  background-color: #7f8c8d;
+  color: #fff;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.btn-secondary[disabled] {
+  background-color: #7f8c8d;
+  color: #fff;
+}
+
 .btn-danger {
   background-color: var(--danger-color);
   color: #fff;
@@ -106,6 +162,13 @@ nav a:hover {
   color: #fff;
 }
 
+.btn-success[disabled] {
+  background-color: var(--success-color);
+  color: #fff;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
 .btn-success:hover {
   background-color: #218c74;
 }
@@ -114,6 +177,7 @@ input[type="text"],
 input[type="password"],
 input[type="number"],
 input[type="datetime-local"],
+input[type="email"],
 select {
   width: 100%;
   padding: 10px;
@@ -168,6 +232,13 @@ select {
   }
 }
 
+.section-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 .section-title {
   color: var(--header-color);
   font-size: 2rem;
@@ -205,6 +276,12 @@ select {
 
 .text-danger {
   color: var(--danger-color);
+}
+
+@media screen and (max-width: 936px) {
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
@@ -283,8 +360,98 @@ select {
   border-radius: 50%;
 }
 
+/* Styling for register form */
+.register-form {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.register-form .avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+}
+
+.register-form-body {
+  margin-top: 20px;
+}
+
+.register-form .form-group {
+  margin-bottom: 15px;
+}
+
+.register-form input[type="text"],
+.register-form input[type="password"],
+.register-form input[type="email"],
+.register-form select {
+  padding: 12px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  width: -webkit-fill-available;
+}
+
+.register-form .btn-block {
+  width: 100%;
+  padding: 12px;
+}
+
+.register-form .btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.register-form .btn-primary:hover {
+  background-color: #2980b9;
+}
+
+/* Styling for events page */
+.btn-register {
+  background-color: var(--primary-color);
+  color: #fff;
+  position: relative;
+  padding: 11px 0;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-register:hover {
+  background-color: var(--success-color);
+}
+
+.btn-unregister {
+  background-color: var(--success-color);
+  color: #fff;
+  position: relative;
+  padding: 20px 0;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-unregister::after {
+  content: "Registered";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: content 0.3s ease;
+}
+
+.btn-unregister:hover {
+  background-color: var(--danger-color);
+}
+
+.btn-unregister:hover::after {
+  content: "Unregister?";
+}
+
 /* Styling for admin dashboard */
-/* General container styling for the toggle view */
 .toggle-view {
   text-align: center;
   margin: 20px 0;
@@ -430,4 +597,75 @@ input:checked + .slider:before {
 
 .table-view {
   margin-top: 20px;
+}
+
+.edit-form {
+  margin-top: 20px;
+  padding: 20px;
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.edit-form h3 {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+
+.edit-form .form-group {
+  margin-bottom: 15px;
+}
+
+.edit-form input[type="text"],
+.edit-form input[type="number"],
+.edit-form input[type="datetime-local"],
+.edit-form input[type="email"],
+.edit-form select {
+  width: -webkit-fill-available;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.edit-form .btn {
+  margin-top: 10px;
+  margin-right: 10px;
+}
+
+.user-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+  object-fit: cover;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.user-profile {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* Alert Messages */
+.alert {
+  padding: 15px;
+  margin: 20px auto;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.alert-success {
+  background-color: var(--success-color);
+}
+
+.alert-danger {
+  background-color: var(--danger-color);
 }
